@@ -20,8 +20,8 @@
   "files": [
     "solidity/contracts",
     "solidity/interfaces",
-    "artifacts/solidity/**/*.json",
-    "!artifacts/solidity/**/**/*.dbg.json",
+    "artifacts/contracts/**/*.json",
+    "!artifacts/contracts/**/**/*.dbg.json",
     "typechained",
     "deployments",
     "!deployments/localhost",

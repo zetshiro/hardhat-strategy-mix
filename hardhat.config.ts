@@ -58,7 +58,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: '0.8.7',
+        version: '0.8.9',
         settings: {
           optimizer: {
             enabled: true,
@@ -84,9 +84,6 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: 'typechained',
     target: 'ethers-v5',
-  },
-  paths: {
-    sources: './solidity',
   },
 };
 
