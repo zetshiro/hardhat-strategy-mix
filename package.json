@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git+https://github.com/zetshiro/hardhat-strategy-mix.git"
   },
-  "license": "AGPL-3.0-only",
+  "license": "GPL-3.0",
   "contributors": [],
   "files": [
     "solidity/contracts",
