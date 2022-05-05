@@ -1,7 +1,7 @@
 {
-  "name": "hardhat-boilerplate",
-  "version": "0.0.0",
-  "description": "Hardhat boilerplate",
+  "name": "hardhat-strategy-mix",
+  "version": "0.0.1",
+  "description": "HardHat template for creating your own Yearn strategy",
   "keywords": [
     "ethereum",
     "smart",
@@ -13,23 +13,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/defi-wonderland/hardhat-boilerplate-ts.git"
+    "url": "git+https://github.com/zetshiro/hardhat-strategy-mix.git"
   },
   "license": "AGPL-3.0-only",
-  "contributors": [
-    {
-      "name": "404skillz",
-      "url": "https://github.com/404skillz"
-    },
-    {
-      "name": "0xGorilla",
-      "url": "https://github.com/0xGorilla"
-    },
-    {
-      "name": "wei3erHase",
-      "url": "https://github.com/wei3erHase"
-    }
-  ],
+  "contributors": [],
   "files": [
     "solidity/contracts",
     "solidity/interfaces",
