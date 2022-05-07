@@ -4,8 +4,6 @@ pragma solidity >=0.8.4 <0.9.0;
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {IVaultAccessControl} from '../interfaces/core/Vault/IVaultAccessControl.sol';
-import {IVaultStrategyManager} from '../interfaces/core/Vault/IVaultStrategyManager.sol';
-import {IDebtAllocator} from '../interfaces/periphery/IDebtAllocator.sol';
 import {IBaseStrategy} from '../interfaces/core/IBaseStrategy.sol';
 import {IVaultParameters} from '../interfaces/core/Vault/IVaultParameters.sol';
 
