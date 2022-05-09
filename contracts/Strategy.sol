@@ -25,7 +25,8 @@ contract Strategy is BaseStrategy {
 
   /// @dev if investTrigger is true, the keepers can call this function to invest the funds
   function _invest() internal override {
-    // @todo understand the difference between depositing to a vault vs investing the loose funds for a strategy
+    // vault deposit: the vault receives the underlying token and the receipient will get the yield token in return
+    // strategy invest: the strategy will invest the funds into the underlying protocol
   }
 
   /// @notice adjust the position, e.g. claim and sell rewards, close a position etc.
