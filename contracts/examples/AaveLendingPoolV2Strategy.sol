@@ -5,6 +5,7 @@ import {IERC20} from '@openzeppelin/contracts/interfaces/IERC20.sol';
 
 import {BaseStrategy} from '../core/BaseStrategy.sol';
 import {IAaveLendingPoolV2} from '../interfaces/IAaveLendingPoolV2.sol';
+import {IVault} from '../interfaces/core/Vault/IVault.sol';
 
 /// @notice the strategy receives profit from the gained interests of the loan
 contract AaveLendingPoolV2Strategy is BaseStrategy {
@@ -40,20 +41,35 @@ contract AaveLendingPoolV2Strategy is BaseStrategy {
   }
 
   /// @notice migrate all capital and positions to the new strategy
-  function _migrate(address _newStrategy) internal override {}
+  function _migrate(address _newStrategy) internal override {
+    address _aTokenAddress = _aaveWantAddress();
+    uint256 _aTokenBalance = _aaveWantBalance();
+    uint256 _wantAmount = _wantBalance();
+
+    IERC20(want).transfer(_newStrategy, _wantAmount);
+    IERC20(_aTokenAddress).transfer(_newStrategy, _aTokenBalance);
+  }
 
   /// @notice check whether the harvest function can be called
   /// @dev the strategy can call harvest whenever it wants or when the strategy has accumulated x profits or if it has be y amount of time since the last harvest
-  function harvestTrigger() external view override returns (bool) {}
+  function harvestTrigger() external view override returns (bool) {
+    uint256 _currentTimeDelta = block.timestamp - IVault(vault).lastReport();
+    return _currentTimeDelta >= 24 hours;
+  }
 
   function investTrigger() external view override returns (bool) {
     return _wantBalance() > 0;
   }
 
-  function investable() external view override returns (uint256 _minDebt, uint256 _maxDebt) {}
+  function investable() external pure override returns (uint256 _minDebt, uint256 _maxDebt) {
+    _minDebt = 0;
+    _maxDebt = type(uint256).max;
+  }
 
   /// @dev the amount of want token we have + the amount of the token we have deposited in the underlying protocol
-  function totalAssets() external view override returns (uint256 _totalAssets) {}
+  function totalAssets() external view override returns (uint256) {
+    return _wantBalance() + _aaveWantBalance();
+  }
 
   /// @dev withdraw is alias to free funds, so withdrawable is the amount of funds that we can free from the protocol
   function withdrawable() external view override returns (uint256) {
@@ -68,8 +84,11 @@ contract AaveLendingPoolV2Strategy is BaseStrategy {
     return IERC20(want).balanceOf(address(this));
   }
 
+  function _aaveWantAddress() internal view returns (address) {
+    return lendingPool.getReserveData(want).aTokenAddress;
+  }
+
   function _aaveWantBalance() internal view returns (uint256) {
-    address _aTokenAddress = lendingPool.getReserveData(want).aTokenAddress;
-    return IERC20(_aTokenAddress).balanceOf(address(this));
+    return IERC20(_aaveWantAddress()).balanceOf(address(this));
   }
 }
