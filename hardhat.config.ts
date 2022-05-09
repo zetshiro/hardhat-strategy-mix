@@ -9,20 +9,9 @@ import 'hardhat-gas-reporter';
 import 'hardhat-deploy';
 import 'solidity-coverage';
 import { HardhatUserConfig, MultiSolcUserConfig, NetworksUserConfig } from 'hardhat/types';
-import { task } from 'hardhat/config';
 import * as env from './utils/env';
 import 'tsconfig-paths/register';
-import { ethers } from 'hardhat';
-
-task('deploy-strategy', 'Deploys a strategy')
-  .addParam('strategy', 'The name of the strategy smart contract, e.g. JointStrategy')
-  .addParam('vault', 'The address of the vault the strategy will interact with')
-  .setAction(async (args: { strategy: string; vault: string }, _hh) => {
-    const strategyFactory = await ethers.getContractFactory(args.strategy);
-    const strategy = await strategyFactory.deploy(args.vault);
-
-    console.log(`Strategy ${args.strategy} deployed to ${strategy.address}.`);
-  });
+import './tasks/deploy-strategy';
 
 const networks: NetworksUserConfig =
   env.isHardhatCompile() || env.isHardhatClean() || env.isTesting()
