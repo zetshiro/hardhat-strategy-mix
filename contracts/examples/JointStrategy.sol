@@ -71,7 +71,7 @@ contract JoinStrategy is BaseStrategy {
 
   /// @notice Strategy will deposit tokens to Joint Smart Contract that handles all complex logic for both providers
   function _invest() internal override {
-    if (!_investTrigger()) {
+    if (IJoint(joint).dontInvestWant()) {
       return;
     }
 
@@ -120,9 +120,8 @@ contract JoinStrategy is BaseStrategy {
   function _investTrigger() internal view returns (bool) {
     uint256 wantBalance = IERC20(want).balanceOf(address(this));
     bool _shouldStartEpoch = IJoint(joint).shouldStartEpoch();
-    bool _dontInvestWant = IJoint(joint).dontInvestWant();
 
-    return wantBalance > 0 && _shouldStartEpoch && !_dontInvestWant;
+    return wantBalance > 0 && _shouldStartEpoch;
   }
 
   function _migrate(address _newStrategy) internal override {}
