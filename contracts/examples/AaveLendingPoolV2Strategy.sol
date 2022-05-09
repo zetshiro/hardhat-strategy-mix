@@ -16,7 +16,7 @@ contract AaveLendingPoolV2Strategy is BaseStrategy {
   }
 
   function name() external pure override returns (string memory) {
-    return string(abi.encodePacked('Strategy', 'AaveLendingPool', 'USDC'));
+    return string(abi.encodePacked('Strategy', 'AaveLendingPoolV2', 'USDC'));
   }
 
   /// @notice try everything to withdraw from the underlying protocol.
