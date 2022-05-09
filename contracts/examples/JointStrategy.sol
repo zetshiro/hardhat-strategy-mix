@@ -7,6 +7,7 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {BaseStrategy} from '../core/BaseStrategy.sol';
 import {IBaseStrategy} from '../interfaces/core/IBaseStrategy.sol';
 
+// @note check out the implementation of the joint strategy in https://github.com/fp-crypto/joint-strategy/blob/master/contracts/Joint.sol
 interface IJoint is IBaseStrategy {
   /// @notice withdraw the funds from the underlying protocol and return it back to the depositor
   function closePositionReturnFunds() external;
