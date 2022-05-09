@@ -4,10 +4,10 @@ pragma solidity >=0.8.0 <0.9.0;
 import {IERC20} from '@openzeppelin/contracts/interfaces/IERC20.sol';
 
 // @todo import the contract from the vault v3 package when it's published
-import {BaseStrategy} from './core/BaseStrategy.sol';
+import {BaseStrategy} from '../core/BaseStrategy.sol';
 
 /// @notice an empty strategy with thorough documentations
-contract Strategy is BaseStrategy {
+contract EmptyStrategy is BaseStrategy {
   constructor(address _vault) BaseStrategy(_vault) {}
 
   function name() external pure override returns (string memory) {
