@@ -20,18 +20,24 @@ contract AaveLendingPoolV2Strategy is BaseStrategy {
 
   /// @notice try everything to withdraw from the underlying protocol.
   /// @dev actions can be paying withdrawal fees, unlocking fees, leaving rewards behind, selling at bad prices etc. or any other actions that should only be done under an emergency
-  function _emergencyFreeFunds(uint256 _amountToWithdraw) internal override {}
+  function _emergencyFreeFunds(uint256 _amountToWithdraw) internal override {
+    lendingPool.withdraw(want, _amountToWithdraw, msg.sender);
+  }
 
   /// @dev if investTrigger is true, the keepers can call this function to invest the funds
   function _invest() internal override {
-    // vault deposit: the vault receives the underlying token and the receipient will get the yield token in return
-    // strategy invest: the strategy will invest the funds into the underlying protocol
+    lendingPool.deposit(want, _wantBalance(), msg.sender, 0);
   }
 
   /// @notice adjust the position, e.g. claim and sell rewards, close a position etc.
-  function _harvest() internal override {}
+  function _harvest() internal override {
+    lendingPool.withdraw(want, _aaveWantBalance(), msg.sender);
+  }
 
-  function _freeFunds(uint256 _amount) internal override returns (uint256 _amountFreed) {}
+  function _freeFunds(uint256 _amount) internal pure override returns (uint256) {
+    // only close the position during emergency
+    return 0;
+  }
 
   /// @notice migrate all capital and positions to the new strategy
   function _migrate(address _newStrategy) internal override {}
@@ -40,7 +46,9 @@ contract AaveLendingPoolV2Strategy is BaseStrategy {
   /// @dev the strategy can call harvest whenever it wants or when the strategy has accumulated x profits or if it has be y amount of time since the last harvest
   function harvestTrigger() external view override returns (bool) {}
 
-  function investTrigger() external view override returns (bool) {}
+  function investTrigger() external view override returns (bool) {
+    return _wantBalance() > 0;
+  }
 
   function investable() external view override returns (uint256 _minDebt, uint256 _maxDebt) {}
 
@@ -58,5 +66,10 @@ contract AaveLendingPoolV2Strategy is BaseStrategy {
 
   function _wantBalance() internal view returns (uint256) {
     return IERC20(want).balanceOf(address(this));
+  }
+
+  function _aaveWantBalance() internal view returns (uint256) {
+    address _aTokenAddress = lendingPool.getReserveData(want).aTokenAddress;
+    return IERC20(_aTokenAddress).balanceOf(address(this));
   }
 }
