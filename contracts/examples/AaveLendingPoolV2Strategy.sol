@@ -1,18 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity >=0.8.4 <0.9.0;
 
 import {IERC20} from '@openzeppelin/contracts/interfaces/IERC20.sol';
 
-// @todo import the contract from the vault v3 package when it's published
-import {BaseStrategy} from './core/BaseStrategy.sol';
+import {BaseStrategy} from '../core/BaseStrategy.sol';
+import {IAaveLendingPoolV2} from '../interfaces/IAaveLendingPoolV2.sol';
 
-/// @notice an empty strategy with thorough documentations
-contract Strategy is BaseStrategy {
-  constructor(address _vault) BaseStrategy(_vault) {}
+/// @notice the strategy receives profit from the gained interests of the loan
+contract AaveLendingPoolV2Strategy is BaseStrategy {
+  IAaveLendingPoolV2 public immutable lendingPool;
+
+  constructor(address _vault, IAaveLendingPoolV2 _pool) BaseStrategy(_vault) {
+    lendingPool = _pool;
+  }
 
   function name() external pure override returns (string memory) {
-    // Add your own name here, suggestion e.g. "StrategyCreamYFI"`
-    return 'Strategy<ProtocolName><TokenType>';
+    return string(abi.encodePacked('Strategy', 'AaveLendingPool', 'USDC'));
   }
 
   /// @notice try everything to withdraw from the underlying protocol.
