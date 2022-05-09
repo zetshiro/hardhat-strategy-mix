@@ -64,9 +64,9 @@ contract JoinStrategy is BaseStrategy {
     return _investTrigger();
   }
 
-  function _freeFunds(uint256 _amount) internal override returns (uint256 _freedFunds) {
+  function _freeFunds(uint256 _amount) internal pure override returns (uint256) {
     // Strategy should not close the position to serve vault debt unless it's an emergency
-    return IERC20(want).balanceOf(address(this));
+    return 0;
   }
 
   function _emergencyFreeFunds(uint256 _amountToWithdraw) internal override onlyEmergencyAuthorized {
