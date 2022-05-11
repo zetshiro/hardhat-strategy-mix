@@ -44,7 +44,7 @@ contract EmptyStrategy is BaseStrategy {
   /// @dev the amount of want token we have + the amount of the token we have deposited in the underlying protocol
   function totalAssets() external view override returns (uint256 _totalAssets) {}
 
-  /// @dev withdraw is alias to free funds, so withdrawable is the amount of funds that we can free from the protocol
+  /// @notice the amount of funds we can withdraw from the strategy right now
   function withdrawable() external view override returns (uint256) {
     return _wantBalance();
   }

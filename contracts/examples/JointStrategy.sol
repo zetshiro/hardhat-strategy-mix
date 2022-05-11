@@ -100,6 +100,7 @@ contract JoinStrategy is BaseStrategy {
     return wantBalance > 0 && _shouldStartEpoch;
   }
 
+  // @todo add migration implementation
   function _migrate(address _newStrategy) internal override {}
 
   function delegatedAssets() external view override returns (uint256 _delegatedAssets) {
