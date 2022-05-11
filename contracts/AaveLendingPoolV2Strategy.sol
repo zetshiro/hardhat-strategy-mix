@@ -27,7 +27,10 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
 
   /// @dev if investTrigger is true, the keepers can call this function to invest the funds
   function _invest() internal override {
-    lendingPool.deposit(want, wantBalance(), address(this), 0);
+    uint256 _wantAmount = wantBalance();
+
+    IERC20(want).approve(address(lendingPool), _wantAmount);
+    lendingPool.deposit(want, _wantAmount, address(this), 0);
   }
 
   /// @notice adjust the position, e.g. claim and sell rewards, close a position etc.
