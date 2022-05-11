@@ -3,10 +3,10 @@ pragma solidity >=0.8.4 <0.9.0;
 
 import {IERC20} from '@openzeppelin/contracts/interfaces/IERC20.sol';
 
-import {BaseStrategy} from './BaseStrategy.sol';
+import {BaseStrategy} from './core/BaseStrategy.sol';
 
-import {IVaultParameters} from '../interfaces/core/Vault/IVaultParameters.sol';
-import {IAaveLendingPoolV2} from '../interfaces/IAaveLendingPoolV2.sol';
+import {IVaultParameters} from './interfaces/core/Vault/IVaultParameters.sol';
+import {IAaveLendingPoolV2} from './interfaces/IAaveLendingPoolV2.sol';
 
 /// @notice the strategy receives profit from the gained interests of the loan
 /// @dev see AaveLendingPoolV2USDCStrategy in the examples folder for creating a lending pool strategy for a specific "want" token
