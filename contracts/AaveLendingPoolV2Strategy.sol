@@ -13,6 +13,8 @@ import {IAaveLendingPoolV2} from './interfaces/IAaveLendingPoolV2.sol';
 abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
   IAaveLendingPoolV2 public immutable lendingPool;
 
+  error InvalidAmount();
+
   constructor(address _vault, IAaveLendingPoolV2 _pool) BaseStrategy(_vault) {
     lendingPool = _pool;
   }
@@ -29,12 +31,12 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
   }
 
   /// @notice adjust the position, e.g. claim and sell rewards, close a position etc.
-  function _harvest() internal override {
+  function _harvest() internal override canWithdrawFromLendingPool {
     lendingPool.withdraw(want, type(uint256).max, address(this));
   }
 
   /// @dev normally, we only close the position if we don't have any losses wihch is always the case with the Aave lending pool
-  function _freeFunds(uint256 _amount) internal override returns (uint256) {
+  function _freeFunds(uint256 _amount) internal override canWithdrawFromLendingPool returns (uint256) {
     return lendingPool.withdraw(want, _amount, address(this));
   }
 
@@ -88,5 +90,13 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
 
   function aaveWantBalance() public view returns (uint256) {
     return IERC20(aaveWantAddress()).balanceOf(address(this));
+  }
+
+  modifier canWithdrawFromLendingPool() {
+    if (aaveWantBalance() == 0) {
+      revert InvalidAmount();
+    }
+
+    _;
   }
 }

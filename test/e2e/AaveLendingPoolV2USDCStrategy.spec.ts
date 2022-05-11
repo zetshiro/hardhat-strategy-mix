@@ -46,7 +46,9 @@ describe('AaveLendingPoolV2USDCStrategy @skip-on-coverage', () => {
   // test profitable harvest
   describe('harvest', () => {
     when('strategy has no deposits in the lending pool', () => {
-      then('harvest nothing', async () => {});
+      then('fail to harvest', async () => {
+        await expect(lendingPoolStrategy.harvest()).to.be.revertedWith('InvalidAmount');
+      });
     });
 
     when('strategy has deposits in the lending pool', () => {});
