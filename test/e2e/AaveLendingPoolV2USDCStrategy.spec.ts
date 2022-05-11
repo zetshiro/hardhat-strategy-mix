@@ -1,21 +1,31 @@
-import { MockContract } from '@defi-wonderland/smock';
-import { AaveLendingPoolV2USDCStrategy, AaveLendingPoolV2USDCStrategy__factory, ERC20Mock } from '@typechained';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { AaveLendingPoolV2USDCStrategy, AaveLendingPoolV2USDCStrategy__factory, ERC20 } from '@typechained';
 import { evm } from '@utils';
 import { when } from '@utils/bdd';
 import { ethers } from 'hardhat';
 import { loadVaultFixture } from 'test/fixtures/vault.fixture';
 
 const AAVE_LENDING_PPOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
+const USDC_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 
-describe('AaveLendingPoolV2Strategy @skip-on-coverage', () => {
+describe('AaveLendingPoolV2USDCStrategy @skip-on-coverage', () => {
   let snapshotId: string;
   let lendingPoolStrategy: AaveLendingPoolV2USDCStrategy;
-  let tokenMock: MockContract<ERC20Mock>;
+  let usdc: ERC20;
+  let signer: SignerWithAddress;
 
   before(async () => {
-    const fixture = await loadVaultFixture();
+    [signer] = await ethers.getSigners();
 
-    tokenMock = fixture.tokenMock;
+    const fixture = await loadVaultFixture({
+      wantTokenAddress: USDC_ADDRESS,
+      yieldTokenInput: {
+        name: 'USDC Yield Token',
+        symbol: 'yUSDC',
+      },
+    });
+
+    usdc = fixture.wantToken;
 
     const lendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2USDCStrategy__factory>('AaveLendingPoolV2USDCStrategy');
     lendingPoolStrategy = await lendingPoolStrategyFactory.deploy(fixture.vault.address, AAVE_LENDING_PPOL_ADDRESS);
