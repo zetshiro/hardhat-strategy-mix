@@ -32,7 +32,7 @@ contract AaveLendingPoolV2Strategy is BaseStrategy {
 
   /// @notice adjust the position, e.g. claim and sell rewards, close a position etc.
   function _harvest() internal override {
-    lendingPool.withdraw(want, _aaveWantBalance(), address(this));
+    lendingPool.withdraw(want, type(uint256).max, address(this));
   }
 
   /// @dev normally, we only close the position if we don't have any losses wihch is always the case with the Aave lending pool
