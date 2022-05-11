@@ -1,19 +1,26 @@
-import { AaveLendingPoolV2USDCStrategy, AaveLendingPoolV2USDCStrategy__factory } from '@typechained';
+import { MockContract } from '@defi-wonderland/smock';
+import { AaveLendingPoolV2USDCStrategy, AaveLendingPoolV2USDCStrategy__factory, ERC20Mock } from '@typechained';
 import { evm } from '@utils';
 import { when } from '@utils/bdd';
 import { ethers } from 'hardhat';
+import { loadVaultFixture } from 'test/fixtures/vault.fixture';
 
 const AAVE_LENDING_PPOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
 
 describe('AaveLendingPoolV2Strategy @skip-on-coverage', () => {
   let snapshotId: string;
   let lendingPoolStrategy: AaveLendingPoolV2USDCStrategy;
+  let tokenMock: MockContract<ERC20Mock>;
 
   before(async () => {
     snapshotId = await evm.snapshot.take();
+
+    const fixture = await loadVaultFixture();
+
+    tokenMock = fixture.tokenMock;
+
     const lendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2USDCStrategy__factory>('AaveLendingPoolV2USDCStrategy');
-    // @todo mock the vault
-    lendingPoolStrategy = await lendingPoolStrategyFactory.deploy('', AAVE_LENDING_PPOL_ADDRESS);
+    lendingPoolStrategy = await lendingPoolStrategyFactory.deploy(fixture.vault.address, AAVE_LENDING_PPOL_ADDRESS);
   });
 
   beforeEach(async () => {
