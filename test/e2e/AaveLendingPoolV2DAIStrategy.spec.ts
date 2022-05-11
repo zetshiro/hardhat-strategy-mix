@@ -9,10 +9,9 @@ import { ethers } from 'hardhat';
 import { loadVaultFixture } from 'test/fixtures/vault.fixture';
 import { getNodeUrl } from 'utils/env';
 
-import BN from 'bn.js';
-import chainBN from 'chai-bn';
+import { solidity } from 'ethereum-waffle';
 
-chai.use(chainBN(BN));
+chai.use(solidity);
 
 const AAVE_LENDING_PPOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
 
@@ -67,14 +66,13 @@ describe('AaveLendingPoolV2DAIStrategy @skip-on-coverage', () => {
         await lendingPoolStrategy.invest();
       });
 
-      // @todo find out how Aave pays out interests to the depositor
       then('receive funds on harvest', async () => {
         expect(await lendingPoolStrategy.wantBalance()).to.be.equal(0);
-        expect((await lendingPoolStrategy.aaveWantBalance()).toString()).to.be.bignumber.equal(TEN_K_DAI.toString());
+        expect(await lendingPoolStrategy.aaveWantBalance()).to.be.closeTo(TEN_K_DAI, 100);
 
         await lendingPoolStrategy.harvest();
 
-        expect((await lendingPoolStrategy.wantBalance()).toString()).to.be.bignumber.greaterThanOrEqual(TEN_K_DAI.toString());
+        expect(await lendingPoolStrategy.wantBalance()).to.be.gte(TEN_K_DAI);
         expect(await lendingPoolStrategy.aaveWantBalance()).to.be.equal(0);
       });
     });
