@@ -28,3 +28,5 @@ export const setBalance = async ({ account, balance }: { account: string; balanc
 export const generateRandomAddress = () => {
   return getAddress(randomHex(20));
 };
+
+export const ZERO_ADDRESS = ethers.constants.AddressZero;

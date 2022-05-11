@@ -3,6 +3,8 @@ import { evm } from '@utils';
 import { when } from '@utils/bdd';
 import { ethers } from 'hardhat';
 
+const AAVE_LENDING_PPOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
+
 describe('AaveLendingPoolV2Strategy @skip-on-coverage', () => {
   let snapshotId: string;
   let lendingPoolStrategy: AaveLendingPoolV2USDCStrategy;
@@ -10,7 +12,8 @@ describe('AaveLendingPoolV2Strategy @skip-on-coverage', () => {
   before(async () => {
     snapshotId = await evm.snapshot.take();
     const lendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2USDCStrategy__factory>('AaveLendingPoolV2USDCStrategy');
-    lendingPoolStrategy = await lendingPoolStrategyFactory.deploy('', '');
+    // @todo mock the vault
+    lendingPoolStrategy = await lendingPoolStrategyFactory.deploy('', AAVE_LENDING_PPOL_ADDRESS);
   });
 
   beforeEach(async () => {

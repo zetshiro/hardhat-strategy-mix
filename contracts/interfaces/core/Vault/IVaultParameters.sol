@@ -19,6 +19,8 @@ interface IVaultParameters {
 
   event EmergencyShutdown(bool active); //New emergency shutdown state (if false, normal operation enabled);
 
+  error OnlyGovernanceCanUndoShutdown();
+
   event UpdateHealthCheck(address healthcheck);
 
   event StrategyUpdatePerformanceFee(
@@ -43,8 +45,6 @@ interface IVaultParameters {
   function totalIdle() external view returns (uint256 _totalIdle);
 
   function lastReport() external view returns (uint256 _lastReport);
-
-  function activation() external view returns (uint256 _activation);
 
   function lockedProfit() external view returns (uint256 _lockedProfit);
 

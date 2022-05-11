@@ -4,8 +4,9 @@ pragma solidity >=0.8.4 <0.9.0;
 import {IERC20} from '@openzeppelin/contracts/interfaces/IERC20.sol';
 
 import {BaseStrategy} from './BaseStrategy.sol';
+
+import {IVaultParameters} from '../interfaces/core/Vault/IVaultParameters.sol';
 import {IAaveLendingPoolV2} from '../interfaces/IAaveLendingPoolV2.sol';
-import {IVault} from '../interfaces/core/Vault/IVault.sol';
 
 /// @notice the strategy receives profit from the gained interests of the loan
 /// @dev see AaveLendingPoolV2USDCStrategy in the examples folder for creating a lending pool strategy for a specific "want" token
@@ -50,7 +51,7 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
   /// @notice check whether the harvest function can be called
   /// @dev the strategy can call harvest whenever it wants or when the strategy has accumulated x profits or if it has be y amount of time since the last harvest
   function harvestTrigger() external view override returns (bool) {
-    uint256 _currentTimeDelta = block.timestamp - IVault(vault).lastReport();
+    uint256 _currentTimeDelta = block.timestamp - IVaultParameters(vault).lastReport();
     return _currentTimeDelta >= 24 hours;
   }
 
