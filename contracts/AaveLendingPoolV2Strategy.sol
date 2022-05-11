@@ -25,7 +25,7 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
 
   /// @dev if investTrigger is true, the keepers can call this function to invest the funds
   function _invest() internal override {
-    lendingPool.deposit(want, _wantBalance(), address(this), 0);
+    lendingPool.deposit(want, wantBalance(), address(this), 0);
   }
 
   /// @notice adjust the position, e.g. claim and sell rewards, close a position etc.
@@ -40,9 +40,9 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
 
   /// @notice migrate all capital and positions to the new strategy
   function _migrate(address _newStrategy) internal override {
-    address _aTokenAddress = _aaveWantAddress();
-    uint256 _aTokenBalance = _aaveWantBalance();
-    uint256 _wantAmount = _wantBalance();
+    address _aTokenAddress = aaveWantAddress();
+    uint256 _aTokenBalance = aaveWantBalance();
+    uint256 _wantAmount = wantBalance();
 
     IERC20(want).transfer(_newStrategy, _wantAmount);
     IERC20(_aTokenAddress).transfer(_newStrategy, _aTokenBalance);
@@ -56,7 +56,7 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
   }
 
   function investTrigger() external view override returns (bool) {
-    return _wantBalance() > 0;
+    return wantBalance() > 0;
   }
 
   function investable() external pure override returns (uint256 _minDebt, uint256 _maxDebt) {
@@ -66,27 +66,27 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
 
   /// @dev the amount of want token we have + the amount of the token we have deposited in the underlying protocol
   function totalAssets() external view override returns (uint256) {
-    return _wantBalance() + _aaveWantBalance();
+    return wantBalance() + aaveWantBalance();
   }
 
   /// @notice the amount of funds we can withdraw from the strategy right now
   function withdrawable() external view override returns (uint256) {
-    return _wantBalance();
+    return wantBalance();
   }
 
   function delegatedAssets() external pure override returns (uint256) {
     return 0;
   }
 
-  function _wantBalance() internal view returns (uint256) {
+  function wantBalance() public view returns (uint256) {
     return IERC20(want).balanceOf(address(this));
   }
 
-  function _aaveWantAddress() internal view returns (address) {
+  function aaveWantAddress() public view returns (address) {
     return lendingPool.getReserveData(want).aTokenAddress;
   }
 
-  function _aaveWantBalance() internal view returns (uint256) {
-    return IERC20(_aaveWantAddress()).balanceOf(address(this));
+  function aaveWantBalance() public view returns (uint256) {
+    return IERC20(aaveWantAddress()).balanceOf(address(this));
   }
 }

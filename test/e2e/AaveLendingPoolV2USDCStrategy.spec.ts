@@ -1,9 +1,11 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { AaveLendingPoolV2USDCStrategy, AaveLendingPoolV2USDCStrategy__factory, ERC20 } from '@typechained';
 import { evm } from '@utils';
-import { when } from '@utils/bdd';
+import { then, when } from '@utils/bdd';
+import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { loadVaultFixture } from 'test/fixtures/vault.fixture';
+import { getNodeUrl } from 'utils/env';
 
 const AAVE_LENDING_PPOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
 const USDC_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
@@ -16,6 +18,10 @@ describe('AaveLendingPoolV2USDCStrategy @skip-on-coverage', () => {
 
   before(async () => {
     [signer] = await ethers.getSigners();
+
+    await evm.reset({
+      jsonRpcUrl: getNodeUrl('ethereum'),
+    });
 
     const fixture = await loadVaultFixture({
       wantTokenAddress: USDC_ADDRESS,
@@ -39,7 +45,9 @@ describe('AaveLendingPoolV2USDCStrategy @skip-on-coverage', () => {
 
   // test profitable harvest
   describe('harvest', () => {
-    when('strategy has no deposits in the lending pool', () => {});
+    when('strategy has no deposits in the lending pool', () => {
+      then('harvest nothing', async () => {});
+    });
 
     when('strategy has deposits in the lending pool', () => {});
   });
