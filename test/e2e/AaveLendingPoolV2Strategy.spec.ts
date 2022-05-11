@@ -13,14 +13,14 @@ describe('AaveLendingPoolV2Strategy @skip-on-coverage', () => {
   let tokenMock: MockContract<ERC20Mock>;
 
   before(async () => {
-    snapshotId = await evm.snapshot.take();
-
     const fixture = await loadVaultFixture();
 
     tokenMock = fixture.tokenMock;
 
     const lendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2USDCStrategy__factory>('AaveLendingPoolV2USDCStrategy');
     lendingPoolStrategy = await lendingPoolStrategyFactory.deploy(fixture.vault.address, AAVE_LENDING_PPOL_ADDRESS);
+
+    snapshotId = await evm.snapshot.take();
   });
 
   beforeEach(async () => {
