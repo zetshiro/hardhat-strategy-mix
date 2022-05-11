@@ -1,16 +1,16 @@
-import { AaveLendingPoolV2Strategy, AaveLendingPoolV2Strategy__factory } from '@typechained';
+import { AaveLendingPoolV2USDCStrategy, AaveLendingPoolV2USDCStrategy__factory } from '@typechained';
 import { evm } from '@utils';
 import { when } from '@utils/bdd';
 import { ethers } from 'hardhat';
 
 describe('AaveLendingPoolV2Strategy @skip-on-coverage', () => {
   let snapshotId: string;
-  let aaveLendingPoolV2Strategy: AaveLendingPoolV2Strategy;
+  let lendingPoolStrategy: AaveLendingPoolV2USDCStrategy;
 
   before(async () => {
     snapshotId = await evm.snapshot.take();
-    const aaveLendingPoolV2StrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2Strategy__factory>('AaveLendingPoolV2Strategy');
-    aaveLendingPoolV2Strategy = await aaveLendingPoolV2StrategyFactory.deploy('', '');
+    const lendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2USDCStrategy__factory>('AaveLendingPoolV2USDCStrategy');
+    lendingPoolStrategy = await lendingPoolStrategyFactory.deploy('', '');
   });
 
   beforeEach(async () => {

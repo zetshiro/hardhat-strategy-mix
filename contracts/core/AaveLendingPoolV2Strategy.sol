@@ -3,20 +3,17 @@ pragma solidity >=0.8.4 <0.9.0;
 
 import {IERC20} from '@openzeppelin/contracts/interfaces/IERC20.sol';
 
-import {BaseStrategy} from '../core/BaseStrategy.sol';
+import {BaseStrategy} from './BaseStrategy.sol';
 import {IAaveLendingPoolV2} from '../interfaces/IAaveLendingPoolV2.sol';
 import {IVault} from '../interfaces/core/Vault/IVault.sol';
 
 /// @notice the strategy receives profit from the gained interests of the loan
-contract AaveLendingPoolV2Strategy is BaseStrategy {
+/// @dev see AaveLendingPoolV2USDCStrategy in the examples folder for creating a lending pool strategy for a specific "want" token
+abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
   IAaveLendingPoolV2 public immutable lendingPool;
 
   constructor(address _vault, IAaveLendingPoolV2 _pool) BaseStrategy(_vault) {
     lendingPool = _pool;
-  }
-
-  function name() external pure override returns (string memory) {
-    return string(abi.encodePacked('Strategy', 'AaveLendingPoolV2', 'USDC'));
   }
 
   /// @notice try everything to withdraw from the underlying protocol.
