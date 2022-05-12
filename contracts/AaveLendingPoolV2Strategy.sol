@@ -14,6 +14,7 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
   IAaveLendingPoolV2 public immutable lendingPool;
 
   error InvalidAmount();
+  error NotEnoughAvailableUserBalance();
 
   constructor(address _vault, IAaveLendingPoolV2 _pool) BaseStrategy(_vault) {
     lendingPool = _pool;
@@ -34,12 +35,12 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
   }
 
   /// @notice adjust the position, e.g. claim and sell rewards, close a position etc.
-  function _harvest() internal override canWithdrawFromLendingPool {
+  function _harvest() internal override canWithdrawFromLendingPool(0) {
     lendingPool.withdraw(want, type(uint256).max, address(this));
   }
 
   /// @dev normally, we only close the position if we don't have any losses wihch is always the case with the Aave lending pool
-  function _freeFunds(uint256 _amount) internal override canWithdrawFromLendingPool returns (uint256) {
+  function _freeFunds(uint256 _amount) internal override canWithdrawFromLendingPool(_amount) returns (uint256) {
     return lendingPool.withdraw(want, _amount, address(this));
   }
 
@@ -96,9 +97,15 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
     return IERC20(aaveWantAddress()).balanceOf(address(this));
   }
 
-  modifier canWithdrawFromLendingPool() {
-    if (aaveWantBalance() == 0) {
+  modifier canWithdrawFromLendingPool(uint256 _withdrawAmtToCheckAgainst) {
+    uint256 _aTokenBalance = aaveWantBalance();
+
+    if (_aTokenBalance == 0) {
       revert InvalidAmount();
+    }
+
+    if (_aTokenBalance < _withdrawAmtToCheckAgainst) {
+      revert NotEnoughAvailableUserBalance();
     }
 
     _;
