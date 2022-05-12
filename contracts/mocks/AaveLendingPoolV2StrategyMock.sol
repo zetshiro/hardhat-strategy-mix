@@ -14,4 +14,8 @@ contract AaveLendingPoolV2StrategyMock is AaveLendingPoolV2Strategy {
   function migrateInternal(address _newStrategy) external {
     _migrate(_newStrategy);
   }
+
+  function freeFundsInternal(uint256 _amount) external {
+    _freeFunds(_amount);
+  }
 }
