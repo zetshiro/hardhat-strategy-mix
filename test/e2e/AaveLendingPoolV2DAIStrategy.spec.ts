@@ -1,6 +1,6 @@
 import { JsonRpcSigner } from '@ethersproject/providers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { AaveLendingPoolV2DAIStrategy, AaveLendingPoolV2DAIStrategy__factory, ERC20 } from '@typechained';
+import { AaveLendingPoolV2StrategyMock, AaveLendingPoolV2StrategyMock__factory, ERC20, Vault } from '@typechained';
 import { evm, wallet } from '@utils';
 import { given, then, when } from '@utils/bdd';
 import { TOKENS } from '@utils/constants';
@@ -10,6 +10,7 @@ import { loadVaultFixture } from 'test/fixtures/vault.fixture';
 import { getNodeUrl } from 'utils/env';
 
 import { solidity } from 'ethereum-waffle';
+import { MockContract } from '@defi-wonderland/smock';
 
 chai.use(solidity);
 
@@ -19,10 +20,13 @@ const TEN_K_DAI = ethers.utils.parseEther('10000');
 
 describe('AaveLendingPoolV2DAIStrategy @skip-on-coverage', () => {
   let snapshotId: string;
-  let lendingPoolStrategy: AaveLendingPoolV2DAIStrategy;
+  let lendingPoolStrategy: AaveLendingPoolV2StrategyMock;
+  let newLendingPoolStrategy: AaveLendingPoolV2StrategyMock;
+
   let dai: ERC20;
   let signer: SignerWithAddress;
   let daiWhale: JsonRpcSigner;
+  let vault: MockContract<Vault>;
 
   before(async () => {
     [signer] = await ethers.getSigners();
@@ -40,9 +44,15 @@ describe('AaveLendingPoolV2DAIStrategy @skip-on-coverage', () => {
     });
 
     dai = fixture.wantToken;
+    vault = fixture.vault;
 
-    const lendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2DAIStrategy__factory>('AaveLendingPoolV2DAIStrategy');
-    lendingPoolStrategy = await lendingPoolStrategyFactory.deploy(fixture.vault.address, AAVE_LENDING_PPOL_ADDRESS);
+    const lendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2StrategyMock__factory>('AaveLendingPoolV2StrategyMock');
+    lendingPoolStrategy = await lendingPoolStrategyFactory.deploy(vault.address, AAVE_LENDING_PPOL_ADDRESS);
+
+    const newLendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2StrategyMock__factory>(
+      'AaveLendingPoolV2StrategyMock'
+    );
+    newLendingPoolStrategy = await newLendingPoolStrategyFactory.deploy(vault.address, AAVE_LENDING_PPOL_ADDRESS);
 
     daiWhale = await wallet.impersonate(TOKENS.DAI_WHALE_ADDRESS);
     snapshotId = await evm.snapshot.take();
@@ -52,10 +62,9 @@ describe('AaveLendingPoolV2DAIStrategy @skip-on-coverage', () => {
     await evm.snapshot.revert(snapshotId);
   });
 
-  // test profitable harvest
   describe('harvest', () => {
     when('strategy has no deposits in the lending pool', () => {
-      then('fail to harvest', async () => {
+      then('revert', async () => {
         await expect(lendingPoolStrategy.harvest()).to.be.revertedWith('InvalidAmount');
       });
     });
@@ -80,9 +89,41 @@ describe('AaveLendingPoolV2DAIStrategy @skip-on-coverage', () => {
 
   // test migration
   describe('migrate', () => {
-    when('strategy has no assets', () => {});
+    when('strategy has no assets', () => {
+      then('succeds', async () => {
+        await lendingPoolStrategy.migrateInternal(newLendingPoolStrategy.address);
 
-    when('strategy has assets', () => {});
+        expect(await newLendingPoolStrategy.wantBalance()).to.be.eq(0);
+        expect(await newLendingPoolStrategy.aaveWantBalance()).to.be.eq(0);
+
+        expect(await lendingPoolStrategy.wantBalance()).to.be.eq(0);
+        expect(await lendingPoolStrategy.aaveWantBalance()).to.be.eq(0);
+      });
+    });
+
+    when('strategy has assets', () => {
+      // the strategy has both the underlying tokens and the aave tokens
+      given(async () => {
+        await dai.connect(daiWhale).transfer(lendingPoolStrategy.address, TEN_K_DAI);
+        await lendingPoolStrategy.invest();
+        await dai.connect(daiWhale).transfer(lendingPoolStrategy.address, TEN_K_DAI);
+      });
+
+      then('transfer all capital to the new strategy', async () => {
+        const oldWantBalance = await lendingPoolStrategy.wantBalance();
+        const oldAaveWantBalance = await lendingPoolStrategy.aaveWantBalance();
+
+        expect(oldWantBalance).to.be.eq(TEN_K_DAI);
+        expect(oldAaveWantBalance).to.be.gte(TEN_K_DAI);
+        await lendingPoolStrategy.migrateInternal(newLendingPoolStrategy.address);
+
+        expect(await lendingPoolStrategy.wantBalance()).to.be.eq(0);
+        expect(await lendingPoolStrategy.aaveWantBalance()).to.be.eq(0);
+
+        expect(await newLendingPoolStrategy.wantBalance()).to.be.eq(oldWantBalance);
+        expect(await newLendingPoolStrategy.aaveWantBalance()).to.be.gte(oldAaveWantBalance);
+      });
+    });
   });
 
   // test free funds
