@@ -2,7 +2,7 @@ import { JsonRpcSigner } from '@ethersproject/providers';
 import { AaveLendingPoolV2StrategyMock, AaveLendingPoolV2StrategyMock__factory, ERC20, Vault } from '@typechained';
 import { evm, wallet } from '@utils';
 import { given, then, when } from '@utils/bdd';
-import { TOKENS } from '@utils/constants';
+import { AAVE_CONTRACTS, TOKENS } from '@utils/constants';
 import chai, { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { loadVaultFixture } from 'test/fixtures/vault.fixture';
@@ -14,7 +14,6 @@ import { advanceToTimeAndBlock } from '@utils/evm';
 
 chai.use(solidity);
 
-const AAVE_LENDING_PPOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
 const TEN_K_DAI = ethers.utils.parseEther('10000');
 
 describe('AaveLendingPoolV2StrategyMock @skip-on-coverage', () => {
@@ -43,12 +42,12 @@ describe('AaveLendingPoolV2StrategyMock @skip-on-coverage', () => {
     vault = fixture.vault;
 
     const lendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2StrategyMock__factory>('AaveLendingPoolV2StrategyMock');
-    lendingPoolStrategy = await lendingPoolStrategyFactory.deploy(vault.address, AAVE_LENDING_PPOL_ADDRESS);
+    lendingPoolStrategy = await lendingPoolStrategyFactory.deploy(vault.address, AAVE_CONTRACTS.V2.MAINNET_LENDING_POOL);
 
     const newLendingPoolStrategyFactory = await ethers.getContractFactory<AaveLendingPoolV2StrategyMock__factory>(
       'AaveLendingPoolV2StrategyMock'
     );
-    newLendingPoolStrategy = await newLendingPoolStrategyFactory.deploy(vault.address, AAVE_LENDING_PPOL_ADDRESS);
+    newLendingPoolStrategy = await newLendingPoolStrategyFactory.deploy(vault.address, AAVE_CONTRACTS.V2.MAINNET_LENDING_POOL);
 
     daiWhale = await wallet.impersonate(TOKENS.DAI_WHALE_ADDRESS);
     snapshotId = await evm.snapshot.take();
