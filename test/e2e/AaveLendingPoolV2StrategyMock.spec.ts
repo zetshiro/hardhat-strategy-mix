@@ -18,7 +18,7 @@ const AAVE_LENDING_PPOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
 
 const TEN_K_DAI = ethers.utils.parseEther('10000');
 
-describe('AaveLendingPoolV2DAIStrategy @skip-on-coverage', () => {
+describe('AaveLendingPoolV2StrategyMock @skip-on-coverage', () => {
   let snapshotId: string;
   let lendingPoolStrategy: AaveLendingPoolV2StrategyMock;
   let newLendingPoolStrategy: AaveLendingPoolV2StrategyMock;
