@@ -45,15 +45,7 @@ contract EmptyStrategy is BaseStrategy {
   function totalAssets() external view override returns (uint256 _totalAssets) {}
 
   /// @notice the amount of funds we can withdraw from the strategy right now
-  function withdrawable() external view override returns (uint256) {
-    return _wantBalance();
-  }
+  function withdrawable() external view override returns (uint256 _withdrawable) {}
 
-  function delegatedAssets() external pure override returns (uint256) {
-    return 0;
-  }
-
-  function _wantBalance() internal view returns (uint256) {
-    return IERC20(want).balanceOf(address(this));
-  }
+  function delegatedAssets() external pure override returns (uint256 _delegatedAssets) {}
 }

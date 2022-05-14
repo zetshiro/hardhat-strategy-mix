@@ -75,9 +75,9 @@ abstract contract AaveLendingPoolV2Strategy is BaseStrategy {
     return wantBalance() + aaveWantBalance();
   }
 
-  /// @notice the amount of funds we can withdraw from the strategy right now
+  /// @notice the amount of funds we can withdraw from the the lending pool
   function withdrawable() external view override returns (uint256) {
-    return wantBalance();
+    return aaveWantBalance();
   }
 
   function delegatedAssets() external pure override returns (uint256) {
